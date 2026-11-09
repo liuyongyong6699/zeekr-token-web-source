@@ -1,0 +1,38 @@
+# Zeekr Token Web - .dockerignore
+
+# Dependencies
+node_modules/
+
+# Build artifacts
+*.log
+npm-debug.log*
+.nyc_output
+coverage/
+
+# IDE/Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Git
+.git/
+.gitignore
+
+# Test/Dev files
+test-*.cjs
+check-*.cjs
+*.md
+
+# Backup
+*.zip
+backup-*/
+
+# Minis specific
+/var/minis/
+
+# Local development
+*.local.*
+.env*
+!.env.example

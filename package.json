@@ -1,0 +1,15 @@
+{
+  "name": "zeekr-token-local-web",
+  "version": "1.0.1",
+  "private": true,
+  "description": "Personal loopback-only Zeekr SMS login and Token export tool",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "start": "node server.cjs",
+    "test": "node --test tests.cjs test-deadlines.cjs",
+    "test:official": "node check-official.cjs",
+    "test:ui": "node test-ui.cjs",
+    "browser:install": "playwright-core install chromium"
+  },
+  "dependencies": { "playwright-core": "1.56.1" }
+}
