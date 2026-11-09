@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="referrer" content="no-referrer">
+  <title>极氪 Token · 本地工具</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div class="layout">
+    <header class="topbar">
+      <span class="wordmark">ZEEKR <span>/ TOKEN</span></span>
+      <span class="local-tag"><span class="dot"></span>仅本机</span>
+    </header>
+    <main>
+      <section class="intro">
+        <div class="eyebrow">PERSONAL TOOL · 非官方个人工具</div>
+        <h1>验证你的手机号，<br>获取签到 Token<span class="orange">.</span></h1>
+        <p>不用抓包。完成官方图形验证和短信验证，<br class="wide-break">登录后复制到青龙，即可开始测试签到。</p>
+      </section>
+      <section class="card" aria-labelledby="card-title">
+        <div class="card-header">
+          <h2 id="card-title">短信验证登录</h2>
+          <span id="connection" class="connection">连接中</span>
+        </div>
+        <ol class="steps" aria-label="登录步骤">
+          <li id="step-one" class="active"><span>1</span>手机号</li>
+          <li id="step-two"><span>2</span>安全验证</li>
+          <li id="step-three"><span>3</span>获取 Token</li>
+        </ol>
+        <form id="login-form" novalidate>
+          <label class="field-label" for="phone">手机号码</label>
+          <div class="phone-field">
+            <span class="country">+86</span>
+            <input id="phone" type="tel" inputmode="numeric" autocomplete="tel-national"
+              placeholder="请输入 11 位手机号" maxlength="11" pattern="1[3-9][0-9]{9}" required>
+          </div>
+          <label class="consent">
+            <input id="consent" type="checkbox">
+            <span>我已阅读并同意极氪
+              <a href="https://www.zeekrlife.com/privacyAndLaw?id=2" target="_blank" rel="noopener noreferrer">用户协议</a>与
+              <a href="https://www.zeekrlife.com/privacyAndLaw" target="_blank" rel="noopener noreferrer">隐私政策</a>，
+              确认仅登录自己的账号，并允许本地浏览器加载官网及其风控服务。
+              未注册号码可能自动注册，请先确认。</span>
+          </label>
+          <button id="get-captcha" class="button secondary" type="button" disabled>
+            获取图形验证码 <span aria-hidden="true">→</span>
+          </button>
+          <section id="captcha-section" class="verification" hidden>
+            <div class="section-line">
+              <label class="field-label" for="captcha-code">图形验证码</label>
+              <button id="refresh-captcha" class="text-button" type="button">换一张</button>
+            </div>
+            <div class="captcha-row">
+              <input id="captcha-code" type="text" autocomplete="off" autocapitalize="off"
+                spellcheck="false" maxlength="6" placeholder="图片中的字符" aria-describedby="captcha-note">
+              <img id="captcha-image" alt="极氪官方图形验证码，请手动输入图片中的字符" width="124" height="48">
+            </div>
+            <p id="captcha-note" class="small-note">获取图片不会发送短信，也不会自动识别验证码。</p>
+            <button id="send-sms" class="button secondary" type="button">发送短信验证码</button>
+          </section>
+          <section id="sms-section" class="verification" hidden>
+            <label class="field-label" for="sms-code">短信验证码</label>
+            <input id="sms-code" type="text" inputmode="numeric" autocomplete="one-time-code"
+              maxlength="6" placeholder="输入收到的 4～6 位验证码">
+            <button id="submit-login" class="button primary" type="submit">登录并获取 Token <span aria-hidden="true">↗</span></button>
+          </section>
+        </form>
+        <div id="status" class="status" role="status" aria-live="polite">正在连接本地服务…</div>
+        <button id="cancel-load" class="text-button" type="button" hidden>停止本次等待（不发送短信）</button>
+        <section id="result" class="result" hidden aria-labelledby="result-title">
+          <div class="result-heading"><span class="success-mark">✓</span><h3 id="result-title">已获取 Token</h3></div>
+          <p id="token-meta" class="token-meta"></p>
+          <div class="env-label">青龙环境变量名称 <code>ZEEKR_TOKEN</code></div>
+          <textarea id="token" rows="3" readonly autocomplete="off" spellcheck="false" hidden aria-label="完整的 Token 环境变量值"></textarea>
+          <p id="token-hidden" class="token-hidden">Token 已隐藏。点击「复制变量值」即可使用。</p>
+          <div class="result-actions">
+            <button id="copy-token" class="button primary" type="button">复制变量值</button>
+            <button id="show-token" class="button secondary" type="button">显示</button>
+          </div>
+          <div class="minor-actions">
+            <button id="download-env" class="text-button" type="button">下载 .env</button>
+            <button id="clear-token" class="text-button" type="button">清除本页</button>
+          </div>
+          <p class="result-warning">这是官网登录返回的 JWT。复制到青龙后请先手动运行签到脚本验证兼容性；本页不会自动签到或领奖。Token 等同登录凭据，不要发送给他人。</p>
+        </section>
+      </section>
+      <section class="privacy-note">
+        <span class="shield" aria-hidden="true">◇</span>
+        <div><strong>本地处理，不保存凭据</strong><p>验证码和 Token 不记录日志、不写入浏览器缓存。登录请求只通过本机后台发往极氪官方及其风控服务；完整 Token 仅在当前页面内存中显示。</p></div>
+      </section>
+      <details class="help">
+        <summary>使用说明与安全提示</summary>
+        <ul>
+          <li>此网页需要本地 Node.js 服务，不能单独双击 HTML 使用。</li>
+          <li>默认地址为 http://127.0.0.1:8767，拒绝公网和跨站请求。仅在自己电脑 / 手机运行，勿部署公共 Token 收集站。</li>
+          <li>只凭手机号不能获取账号 Token；须完成官方验证。没有验证码时不会尝试登录。</li>
+          <li>短信每次至少冷却 60 秒、同一号码每小时最多 3 次。发送结果不明时，先查看短信，不自动重试。</li>
+          <li>重新登录可能影响现有 App 登录状态或旧 Token。不要反复登录；有效期以实际 JWT 为准。</li>
+          <li>刷新页面会丢弃已获取的 Token；15 分钟后本地会话到期。</li>
+          <li>复制会将凭据放入系统剪贴板；下载 .env 会生成明文文件。用完请自行清除剪贴板或删除文件。</li>
+        </ul>
+      </details>
+    </main>
+    <footer>LOCAL FIRST <span>·</span> 为自己的账号使用 <span>·</span> v1.0.1</footer>
+  </div>
+</body>
+</html>
