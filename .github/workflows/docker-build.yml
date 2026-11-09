@@ -1,0 +1,70 @@
+name: Build ARM64 Docker Image
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  packages: write
+  actions: read
+
+jobs:
+  build-arm64:
+    name: Build linux/arm64
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build ARM64 image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/arm64
+          load: true
+          tags: zeekr-token-web:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Export tarball
+        run: |
+          docker save zeekr-token-web:${{ github.sha }} | gzip > zeekr-token-web.tar.gz
+          echo "FILE=zeekr-token-web.tar.gz" >> $GITHUB_ENV
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: zeekr-token-web-arm64
+          path: zeekr-token-web.tar.gz
+          retention-days: 7
+
+      - name: Print digest
+        run: |
+          docker images --digests zeekr-token-web:${{ github.sha }}
+          sha256sum zeekr-token-web.tar.gz
+
+  build-amd64:
+    name: Build linux/amd64 (optional)
+    runs-on: ubuntu-latest
+    if: false  # 如需同时产出 amd64，改为 true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          load: true
+          tags: zeekr-token-web:${{ github.sha }}-amd64
+      - run: |
+          docker save zeekr-token-web:${{ github.sha }}-amd64 | gzip > zeekr-token-web-amd64.tar.gz
+      - uses: actions/upload-artifact@v4
+        with:
+          name: zeekr-token-web-amd64
+          path: zeekr-token-web-amd64.tar.gz
+          retention-days: 7
